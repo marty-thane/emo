@@ -3,7 +3,6 @@
 # large numbers of items.
 
 import json
-import numpy as np
 from random import randint
 
 JSON_FILE = "items.json"
