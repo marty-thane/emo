@@ -1,0 +1,42 @@
+{
+  "laptop": {
+    "value": 1500,
+    "weight": 4
+  },
+  "smartphone": {
+    "value": 1000,
+    "weight": 1
+  },
+  "camera": {
+    "value": 800,
+    "weight": 2
+  },
+  "tablet": {
+    "value": 1200,
+    "weight": 3
+  },
+  "headphones": {
+    "value": 300,
+    "weight": 0.5
+  },
+  "watch": {
+    "value": 400,
+    "weight": 0.3
+  },
+  "speaker": {
+    "value": 600,
+    "weight": 1
+  },
+  "external_hard_drive": {
+    "value": 200,
+    "weight": 0.7
+  },
+  "gaming_console": {
+    "value": 1300,
+    "weight": 5
+  },
+  "e-reader": {
+    "value": 500,
+    "weight": 0.8
+  }
+}
