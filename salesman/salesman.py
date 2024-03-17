@@ -1,14 +1,20 @@
 # WORK IN PROGRESS!!!
-# Solving the travelling businessman problem using hill climbing. Loads an external JSON file.
+# Solving the travelling businessman problem using hill climbing. Loads an
+# external JSON file.
 
 import json
 import matplotlib.pyplot as plt
-from matplotlib.lines import Line2D
 
 JSON_FILE = "items.json"
 GENERATIONS = 1000
 
-def display(route, cities) -> None:
+def load(file: str) -> dict:
+    """
+    Loads a JSON file provided as an argument and returns it as a dictionary.
+    """
+    with open(file, "r") as j: return json.load(j)
+
+def display() -> None:
     """
     Draws the final route. THIS IS ONLY A DRAFT AND WILL CHANGE WHEN THE ARCHITECTURE IS DECIDED.
     """
