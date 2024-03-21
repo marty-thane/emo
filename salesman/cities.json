@@ -1,0 +1,42 @@
+{
+  "Sapphire City": {
+    "x": 60,
+    "y": 25
+  },
+  "Emerald Bay": {
+    "x": 32,
+    "y": 70
+  },
+  "Aurora Falls": {
+    "x": 42,
+    "y": 110
+  },
+  "Whispering Pines": {
+    "x": 18,
+    "y": 45
+  },
+  "Golden Haven": {
+    "x": 55,
+    "y": 95
+  },
+  "Mystic Grove": {
+    "x": 26,
+    "y": 130
+  },
+  "Elysium Heights": {
+    "x": 38,
+    "y": 5
+  },
+  "Crystal Shores": {
+    "x": 50,
+    "y": 40
+  },
+  "Phoenix Summit": {
+    "x": 45,
+    "y": 85
+  },
+  "Radiant Valley": {
+    "x": 22,
+    "y": 75
+  }
+}
