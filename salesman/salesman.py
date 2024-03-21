@@ -4,8 +4,6 @@
 # Note on algo: Best route in a generation becomes the exclusive parent of the
 # next generation. Best parent is selected as the optimal solution.
 
-# TODO: cleanup, keep the best best found solution.
-
 import json
 import numpy as np
 import matplotlib.pyplot as plt
