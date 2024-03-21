@@ -21,13 +21,13 @@ def load(file: str) -> dict:
     """
     with open(file, "r") as j: return json.load(j)
 
-def preprocess(cities: dict) -> tuple[list, np.ndarray]:
+def preprocess(cities: dict) -> tuple[list, list]:
     """
     Extracts names and coordinates from loaded JSON and returns them as a pair
     of lists.
     """
     names = list(cities)
-    coords = np.array([list(c.values()) for c in cities.values()], dtype=np.int16)
+    coords = [list(c.values()) for c in cities.values()]
     return names, coords
 
 def dist(x1: int, y1: int, x2: int, y2: int) -> float:
@@ -36,7 +36,7 @@ def dist(x1: int, y1: int, x2: int, y2: int) -> float:
     """
     return ((x1 - x2)**2 + (y1 - y2)**2)**0.5
 
-def dist_matrix(coords: np.ndarray) -> np.ndarray:
+def dist_matrix(coords: list) -> np.ndarray:
     """
     Generates a distance matrix for given city coords and returns it.
     """
@@ -63,6 +63,12 @@ def mutate(route: np.ndarray, p: float) -> np.ndarray:
         if np.random.uniform() <= p:
             mutated[[i, (i+1)%(i+1)]] = mutated[[(i+1)%(i+1), i]] # wrap around
     return mutated
+
+def sort(items: list, order: list) -> list:
+    """
+    Returns provided list sorted by a given order.
+    """
+    return [items[order[i]] for i in range(len(items))]
 
 def display(names: list, coords: np.ndarray) -> None:
     """
@@ -101,11 +107,11 @@ def main():
         if scores[best_idx] < best_score:
             best_route = routes[best_idx]
             best_score = scores[best_idx]
-            print(best_route, best_score)
+            print(f"route: {sort(names, best_route)}, length: {best_score}")
         parent = routes[best_idx]
 
-    ordered_names = [names[best_route[i]] for i in range(len(names))]
-    ordered_coords = [coords[best_route[i]] for i in range(len(names))]
+    ordered_names = sort(names, best_route)
+    ordered_coords = sort(coords, best_route)
 
     print(ordered_names)
     display(ordered_names, np.array(ordered_coords))
