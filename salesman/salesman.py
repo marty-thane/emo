@@ -112,8 +112,6 @@ def main():
 
     ordered_names = sort(names, best_route)
     ordered_coords = sort(coords, best_route)
-
-    print(ordered_names)
     display(ordered_names, np.array(ordered_coords))
 
 main()
