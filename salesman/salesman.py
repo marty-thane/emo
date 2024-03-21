@@ -1,6 +1,8 @@
-# WORK IN PROGRESS!!!
-# Solving the travelling businessman problem using hill climbing. Loads an
-# external JSON file.
+# Solving the travelling businessman problem using modified hill climbing
+# algorithm. Loads an external JSON file. Uses NumPy arrays to speed up
+# computation.
+# Note on algo: Best route in a generation becomes the exclusive parent of the
+# next generation. Best parent is selected as the optimal solution.
 
 # TODO: cleanup, keep the best best found solution.
 
@@ -9,9 +11,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 JSON_FILE = "cities.json"
-GENERATIONS = 500
-POPULATION_SIZE = 20
-MUTATION_RATE = 0.23
+GENERATIONS = 1000
+POPULATION_SIZE = 50
+MUTATION_RATE = 0.35
 
 def load(file: str) -> dict:
     """
@@ -19,7 +21,7 @@ def load(file: str) -> dict:
     """
     with open(file, "r") as j: return json.load(j)
 
-def split(cities: dict) -> tuple[list, np.ndarray]:
+def preprocess(cities: dict) -> tuple[list, np.ndarray]:
     """
     Extracts names and coordinates from loaded JSON and returns them as a pair
     of lists.
@@ -28,32 +30,22 @@ def split(cities: dict) -> tuple[list, np.ndarray]:
     coords = np.array([list(c.values()) for c in cities.values()], dtype=np.int16)
     return names, coords
 
-def dist(a: list, b: list) -> float:
+def dist(x1: int, y1: int, x2: int, y2: int) -> float:
     """
-    Calculates distance between two points given as lists of coordinates using
-    pythagorean theorem.
+    Calculates distance between two points using Pythagorean theorem.
     """
-    return ((a[0] - b[0])**2 + (a[1] - b[1])**2)**0.5
+    return ((x1 - x2)**2 + (y1 - y2)**2)**0.5
 
-def distance_of(cities: np.ndarray) -> np.ndarray:
+def dist_matrix(coords: np.ndarray) -> np.ndarray:
     """
-    Generates a distance matrix for given cities and returns it.
+    Generates a distance matrix for given city coords and returns it.
     """
-    n = len(cities)
-
+    n = len(coords)
     matrix = np.zeros((n,n), dtype=np.int32)
-    for i in range(n):
+    for i in range(n-1):
         for j in range(i+1,n):
-            matrix[i][j] = dist(cities[i], cities[j])
+            matrix[i][j] = dist(*coords[i], *coords[j]) # spread syntax
     return matrix + matrix.T
-
-def generate_initial(n: int, k: int) -> np.ndarray:
-    """
-    Produces population of size n with its members of size k.
-    """
-    default = np.arange(k, dtype=np.int16)
-    return np.array([np.random.permutation(default) for _ in range(n)], dtype=np.int16)
-
 
 def fitness_of(route: np.ndarray, distances: np.ndarray) -> int:
     """
@@ -61,26 +53,29 @@ def fitness_of(route: np.ndarray, distances: np.ndarray) -> int:
     """
     return sum([distances[route[i]][route[i+1]] for i in range(len(route)-1)])
 
-def mutate(route: np.ndarray, p_mut: float) -> np.ndarray:
+def mutate(route: np.ndarray, p: float) -> np.ndarray:
+    """
+    Swaps adjacent cities in a route with given probability. Returns the
+    mutated route. Is able to swap first and last city too by using modulo.
+    """
     mutated = np.copy(route)
-    for i in range(len(route)-1):
-        if np.random.uniform() <= p_mut:
-            mutated[[i, i+1]] = mutated[[i+1, i]]
+    for i in range(len(route)):
+        if np.random.uniform() <= p:
+            mutated[[i, (i+1)%(i+1)]] = mutated[[(i+1)%(i+1), i]] # wrap around
     return mutated
 
 def display(names: list, coords: np.ndarray) -> None:
     """
-    Draws the final route.
+    Draws the final route using mathplotlib.
     """
-    x_coords = coords[:, 0]
-    y_coords = coords[:, 1]
-    print(x_coords)
+    x = coords[:, 0]
+    y = coords[:, 1]
 
     plt.style.use("bmh")
-    plt.scatter(x_coords, y_coords, zorder=2)
-    plt.plot(x_coords, y_coords, zorder=1)
-    for i, name in enumerate(names):
-        plt.annotate(name, (x_coords[i], y_coords[i]), textcoords="offset points", xytext=(0,10), ha="center")
+    plt.scatter(x, y) # cities
+    plt.plot(x, y) # routes
+    for i, name in enumerate(names): # names
+        plt.annotate(name, (x[i], y[i]), textcoords="offset points", xytext=(0,10), ha="center")
 
     plt.title("Optimal route between cities")
     plt.xlabel("Latitude")
@@ -90,20 +85,30 @@ def display(names: list, coords: np.ndarray) -> None:
 
 def main():
     cities = load(JSON_FILE)
-    names, coords = split(cities)
-    distances = distance_of(coords)
-    population = generate_initial(POPULATION_SIZE, len(names))
-    best_route = None
-    for _ in range(GENERATIONS):
-        scores = [fitness_of(member, distances) for member in population]
-        best_idx = np.argmin(scores)
-        print(scores[best_idx])
-        best_route = population[best_idx]
-        population = np.array([mutate(best_route, MUTATION_RATE) for _ in range(POPULATION_SIZE)], dtype=np.int16)
-    ordered_names = [names[best_route[i]] for i in range(len(names))] # maybe use zip instead
-    ordered_coords = [coords[best_route[i]] for i in range(len(names))]
-    display(ordered_names, np.array(ordered_coords))
+    names, coords = preprocess(cities)
+    distances = dist_matrix(coords)
 
+    parent = np.random.permutation(len(coords))
+    best_route = parent
+    best_score = fitness_of(best_route, distances)
+    for _ in range(GENERATIONS):
+        routes = np.array([
+            mutate(parent, MUTATION_RATE)
+            for _ in range(POPULATION_SIZE)
+            ], dtype=np.int16)
+        scores = np.array([fitness_of(route, distances) for route in routes], dtype=np.int16)
+        best_idx = np.argmin(scores)
+        if scores[best_idx] < best_score:
+            best_route = routes[best_idx]
+            best_score = scores[best_idx]
+            print(best_route, best_score)
+        parent = routes[best_idx]
+
+    ordered_names = [names[best_route[i]] for i in range(len(names))]
+    ordered_coords = [coords[best_route[i]] for i in range(len(names))]
+
+    print(ordered_names)
+    display(ordered_names, np.array(ordered_coords))
 
 main()
 
