@@ -13,7 +13,7 @@ def load(file: str) -> dict:
     """
     Loads a JSON file provided as an argument and returns it as a dictionary.
     """
-    with open(file, "r") as j: return json.load(j)
+    with open(file, "r") as f: return json.load(f)
 
 def generate_from(items: dict) -> list:
     """
@@ -21,7 +21,7 @@ def generate_from(items: dict) -> list:
     """
     return [randint(0, 1) for _ in range(len(items))]
 
-def gamma(genotype: list, items: dict) -> dict:
+def gamma_of(genotype: list, items: dict) -> dict:
     """
     Filters the items by a given genotype. Returns the filtered dict.
     """
@@ -47,11 +47,11 @@ def main():
     items = load(JSON_FILE)
     for _ in range(GENERATIONS):
         genotype = generate_from(items)
-        fenotype = gamma(genotype, items)
+        fenotype = gamma_of(genotype, items)
         fitness = fitness_of(fenotype)
         if fitness > best_fitness:
             best_fenotype = fenotype
             best_fitness = fitness
-    print(f"items: {list(best_fenotype)}, value: {best_fitness}")
+            print(f"items: {list(best_fenotype)}, value: {best_fitness}")
 
 main()
