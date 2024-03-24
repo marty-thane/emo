@@ -76,9 +76,8 @@ def display(names: list, coords: np.ndarray) -> None:
     y = coords[:, 1]
 
     plt.style.use("bmh")
-    plt.scatter(x, y) # cities
-    plt.plot(x, y) # routes
-    for i, name in enumerate(names): # names
+    plt.plot(x, y, "-o")
+    for i, name in enumerate(names):
         plt.annotate(name, (x[i], y[i]), textcoords="offset points", xytext=(0,10), ha="center")
 
     plt.title("Optimal route between cities")
