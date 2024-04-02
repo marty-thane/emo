@@ -19,30 +19,24 @@ def load(file: str) -> dict:
     """
     with open(file, "r") as j: return json.load(j)
 
-def preprocess(cities: dict) -> tuple[list, list]:
+def preprocess(cities: dict) -> tuple[list, np.ndarray]:
     """
-    Extracts names and coordinates from loaded JSON and returns them as a pair
-    of lists.
+    Extracts names and coordinates from loaded JSON and returns them as a
+    list/ndarray pair.
     """
     names = list(cities)
     coords = [list(c.values()) for c in cities.values()]
-    return names, coords
+    return names, np.array(coords)
 
-def dist(x1: int, y1: int, x2: int, y2: int) -> float:
-    """
-    Calculates distance between two points using Pythagorean theorem.
-    """
-    return ((x1 - x2)**2 + (y1 - y2)**2)**0.5
-
-def dist_matrix(coords: list) -> np.ndarray:
+def dist_matrix(coords: np.ndarray) -> np.ndarray:
     """
     Generates a distance matrix for given city coords and returns it.
     """
     n = len(coords)
-    matrix = np.zeros((n,n), dtype=np.int32)
+    matrix = np.zeros((n,n), dtype=np.int16)
     for i in range(n-1):
         for j in range(i+1,n):
-            matrix[i][j] = dist(*coords[i], *coords[j]) # spread syntax
+            matrix[i][j] = sum((coords[i]-coords[j])**2)**0.5 # pythagorean theorem
     return matrix + matrix.T
 
 def fitness_of(route: np.ndarray, distances: np.ndarray) -> int:
@@ -108,8 +102,8 @@ def main():
         parent = routes[best_idx]
 
     ordered_names = sort(names, best_route)
-    ordered_coords = sort(coords, best_route)
-    display(ordered_names, np.array(ordered_coords))
+    ordered_coords = np.array(sort(list(coords), best_route))
+    display(ordered_names, ordered_coords)
 
 main()
 
