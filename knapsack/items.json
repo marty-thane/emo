@@ -38,5 +38,45 @@
   "e-reader": {
     "value": 500,
     "weight": 0.8
+  },
+  "flash_drive": {
+    "value": 100,
+    "weight": 0.1
+  },
+  "portable_printer": {
+    "value": 700,
+    "weight": 2.5
+  },
+  "fitness_tracker": {
+    "value": 250,
+    "weight": 0.2
+  },
+  "portable_charger": {
+    "value": 150,
+    "weight": 0.4
+  },
+  "wireless_mouse": {
+    "value": 120,
+    "weight": 0.2
+  },
+  "bluetooth_speaker": {
+    "value": 350,
+    "weight": 0.8
+  },
+  "gaming_mouse": {
+    "value": 180,
+    "weight": 0.3
+  },
+  "portable_keyboard": {
+    "value": 200,
+    "weight": 0.5
+  },
+  "USB_hub": {
+    "value": 80,
+    "weight": 0.2
+  },
+  "VR_headset": {
+    "value": 1000,
+    "weight": 1.5
   }
 }
