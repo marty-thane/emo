@@ -97,7 +97,7 @@ MUTATION_RATE = 0.05
 ITEMS = itemize(parse_json(JSON_FILE))
 
 def main():
-    print(f"found {len(ITEMS)} items, weight limit {MAX_WEIGHT}")
+    print(f"loaded {len(ITEMS)} items, weight limit {MAX_WEIGHT}")
     print(f"{2**len(ITEMS)} possible solutions, will try {POPULATION_SIZE*GENERATIONS}")
 
     start_time = time()
