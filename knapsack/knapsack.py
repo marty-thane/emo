@@ -1,3 +1,7 @@
+# Solving the knapsack problem using genetic algorithm. Loads an external JSON
+# file. Uses NumPy arrays to speed up computation. Uses custom class to store
+# item information. Prints useful information during run time.
+
 import json
 import numpy as np
 from time import time
@@ -21,19 +25,34 @@ class Item:
         return self._weight
 
 def parse_json(file: str) -> dict:
+    """
+    Loads a JSON file provided as an argument and returns it as a dictionary.
+    """
     with open(file, "r") as f: return json.load(f)
 
-def itemize(data: dict) -> list:
-    items = []
-    for item_name, item_data in data.items():
-        item = Item(name=item_name, value=item_data['value'], weight=item_data['weight'])
-        items.append(item)
-    return items
+def itemize(dictionary: dict) -> list:
+    """
+    Converts loaded JSON dict into a list of Item objects, which it returns.
+    """
+    return [
+            Item(
+                name=key,
+                value=values["value"],
+                weight=values["weight"]
+                )
+            for key, values in dictionary.items()
+            ]
 
 def gamma(genotype: np.ndarray) -> list:
+    """
+    Filters items by a given genotype. Returns the filtered fenotype.
+    """
     return [i for g, i in zip(genotype, ITEMS) if g]
 
 def fitness(phenotype: list) -> int:
+    """
+    Evaluates given phenotype and returns its score.
+    """
     total_weight = sum([item.weight for item in phenotype])
     if total_weight > MAX_WEIGHT:
         return 1
@@ -41,6 +60,9 @@ def fitness(phenotype: list) -> int:
     return total_value
 
 def select(genotypes: np.ndarray, scores: np.ndarray) -> np.ndarray:
+    """
+    Uses roulette selection to pick a member from population
+    """
     random_number = np.random.rand()
     cumulative_score = 0
     for idx, score in enumerate(scores):
@@ -49,12 +71,18 @@ def select(genotypes: np.ndarray, scores: np.ndarray) -> np.ndarray:
             return genotypes[idx]
 
 def crossover(parent1: np.ndarray, parent2: np.ndarray) -> list[np.ndarray, np.ndarray]:
+    """
+    Returns children created using one-point crossover technique.
+    """
     splitpoint = np.random.randint(0, len(parent1))
     child1 = np.concatenate((parent1[:splitpoint], parent2[splitpoint:]))
     child2 = np.concatenate((parent2[:splitpoint], parent1[splitpoint:]))
     return child1, child2
 
 def mutate(genotype: np.ndarray) -> np.ndarray:
+    """
+    Mutates given genotype uniformly bit-by-bit.
+    """
     mut = np.copy(genotype) # do not modify original
     for idx in range(len(genotype)):
         if np.random.rand() <= MUTATION_RATE:
