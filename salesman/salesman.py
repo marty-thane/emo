@@ -1,16 +1,18 @@
 # Solving the travelling businessman problem using modified hill climbing
 # algorithm. Loads an external JSON file. Uses NumPy arrays to speed up
-# computation.
+# computation. Prints useful information during run time.
 # Note on algo: Best route in a generation becomes the exclusive parent of the
 # next generation. Best parent is selected as the optimal solution.
 
 import json
 import numpy as np
 import matplotlib.pyplot as plt
+from time import time
+from math import factorial as fact
 
 JSON_FILE = "cities.json"
 GENERATIONS = 1000
-POPULATION_SIZE = 50
+POPULATION_SIZE = 25
 MUTATION_RATE = 0.35
 
 def load(file: str) -> dict:
@@ -85,6 +87,11 @@ def main():
     names, coords = preprocess(cities)
     distances = dist_matrix(coords)
 
+    print(f"loaded {len(cities)} cities")
+    print(f"{fact(len(cities))} possible solutions, will try {POPULATION_SIZE*GENERATIONS}")
+
+    start_time = time()
+
     parent = np.random.permutation(len(coords))
     best_route = parent
     best_score = fitness_of(best_route, distances)
@@ -98,11 +105,18 @@ def main():
         if scores[best_idx] < best_score:
             best_route = routes[best_idx]
             best_score = scores[best_idx]
-            print(f"route: {sort(names, best_route)}, length: {best_score}")
         parent = routes[best_idx]
+
+    stop_time = time()
 
     ordered_names = sort(names, best_route)
     ordered_coords = np.array(sort(list(coords), best_route))
+
+    print(f"found solution with score {best_score}:")
+    for pos, city in enumerate(ordered_names):
+        print(f" {pos+1}. {city}")
+    print(f"finished in {round(stop_time-start_time, 2)}s")
+
     display(ordered_names, ordered_coords)
 
 main()
