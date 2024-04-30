@@ -1,6 +1,7 @@
 # Solving the travelling businessman problem using modified hill climbing
 # algorithm. Loads an external JSON file. Uses NumPy arrays to speed up
-# computation. Prints useful information during run time.
+# computation. Prints useful information during run time. Shows found route
+# using Pyplot.
 # Note on algo: Best route in a generation becomes the exclusive parent of the
 # next generation. Best parent is selected as the optimal solution.
 
