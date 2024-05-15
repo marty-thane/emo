@@ -33,17 +33,17 @@ def dist_matrix(coords: np.ndarray) -> np.ndarray:
     Generates a distance matrix for given city coords and returns it.
     """
     n = len(coords)
-    matrix = np.zeros((n,n), dtype=np.int16)
+    matrix = np.zeros((n,n))
     for i in range(n-1):
         for j in range(i+1,n):
-            matrix[i][j] = sum((coords[i]-coords[j])**2)**0.5 # pythagorean theorem
+            matrix[i][j] = np.sum((coords[i]-coords[j])**2)**0.5 # pythagorean theorem
     return matrix + matrix.T
 
 def fitness_of(route: np.ndarray, distances: np.ndarray) -> int:
     """
     Calculates score of a route given distance matrix.
     """
-    return sum([distances[route[i]][route[i+1]] for i in range(len(route)-1)])
+    return np.sum([distances[route[i]][route[i+1]] for i in range(len(route)-1)])
 
 def mutate(route: np.ndarray, p: float) -> np.ndarray:
     """
@@ -97,8 +97,8 @@ def main():
         routes = np.array([
             mutate(parent, MUTATION_RATE)
             for _ in range(POPULATION_SIZE)
-            ], dtype=np.int16)
-        scores = np.array([fitness_of(route, distances) for route in routes], dtype=np.int16)
+            ])
+        scores = np.array([fitness_of(route, distances) for route in routes])
         best_idx = np.argmin(scores)
         if scores[best_idx] < best_score:
             best_route = routes[best_idx]
@@ -110,7 +110,7 @@ def main():
     ordered_names = sort(names, best_route)
     ordered_coords = np.array(sort(list(coords), best_route))
 
-    print(f"found solution with score {best_score}:")
+    print(f"found solution with score {int(best_score)}:")
     for pos, city in enumerate(ordered_names):
         print(f" {pos+1}. {city}")
     print(f"finished in {round(stop_time-start_time, 2)}s")

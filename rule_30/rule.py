@@ -8,19 +8,20 @@ from time import time
 
 RULE = 30
 GENERATIONS = 300
-WIDTH = GENERATIONS*2
 
 def main():
+    width = GENERATIONS*2
+
     start_time = time()
 
     rules = np.array([int(i) for i in np.binary_repr(RULE, 8)])
-    population = np.zeros((GENERATIONS, WIDTH), dtype=int)
+    population = np.zeros((GENERATIONS, width), dtype=int)
 
     # initial state
-    population[0, WIDTH // 2] = 1
+    population[0, width // 2] = 1
 
     for g in range(GENERATIONS-1):
-        for i in range(1,WIDTH-1):
+        for i in range(1,width-1):
             neighbors = population[g, i-1:i+2]
             population[g+1, i] = rules[7-np.dot(neighbors, [4, 2, 1])]
 
