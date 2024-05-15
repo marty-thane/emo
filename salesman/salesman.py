@@ -1,9 +1,6 @@
-# Solving the travelling businessman problem using modified hill climbing
-# algorithm. Loads an external JSON file. Uses NumPy arrays to speed up
-# computation. Prints useful information during run time. Shows found route
-# using Pyplot.
-# Note on algo: Best route in a generation becomes the exclusive parent of the
-# next generation. Best parent is selected as the optimal solution.
+# Solving the travelling businessman problem using hill climbing and hall of
+# fame. Loads an external JSON file. Uses NumPy arrays to speed up computation.
+# Prints useful information during run time. Shows found route using Pyplot.
 
 import json
 import numpy as np
@@ -13,7 +10,7 @@ from math import factorial as fact
 
 JSON_FILE = "cities.json"
 GENERATIONS = 1000
-POPULATION_SIZE = 25
+POPULATION_SIZE = 30
 MUTATION_RATE = 0.35
 
 def load(file: str) -> dict:
