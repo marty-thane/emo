@@ -6,6 +6,12 @@ import json
 import numpy as np
 from time import time
 
+JSON_FILE = "items.json"
+MAX_WEIGHT = 10
+POPULATION_SIZE = 100
+GENERATIONS = 50
+MUTATION_RATE = 0.05
+
 class Item:
     def __init__(self, name: str, value: int, weight: float):
         self._name = name
@@ -43,31 +49,31 @@ def itemize(dictionary: dict) -> list:
             for key, values in dictionary.items()
             ]
 
-def gamma(genotype: np.ndarray) -> list:
+def gamma(genotype: np.ndarray, items: list) -> list:
     """
     Filters items by a given genotype. Returns the filtered fenotype.
     """
-    return [i for g, i in zip(genotype, ITEMS) if g]
+    return [i for g, i in zip(genotype, items) if g]
 
 def fitness(phenotype: list) -> int:
     """
     Evaluates given phenotype and returns its score.
     """
-    total_weight = sum([item.weight for item in phenotype])
+    total_weight = np.sum([item.weight for item in phenotype])
     if total_weight > MAX_WEIGHT:
         return 1
-    total_value = sum([item.value for item in phenotype])
+    total_value = np.sum([item.value for item in phenotype])
     return total_value
 
 def select(genotypes: np.ndarray, scores: np.ndarray) -> np.ndarray:
     """
-    Uses roulette selection to pick a member from population
+    Uses roulette selection to pick a member from population.
     """
-    random_number = np.random.rand()
+    selection = np.random.rand()
     cumulative_score = 0
     for idx, score in enumerate(scores):
         cumulative_score += score
-        if cumulative_score >= random_number:
+        if cumulative_score >= selection:
             return genotypes[idx]
 
 def crossover(parent1: np.ndarray, parent2: np.ndarray) -> list[np.ndarray, np.ndarray]:
@@ -89,25 +95,20 @@ def mutate(genotype: np.ndarray) -> np.ndarray:
             mut[idx] = 1 - mut[idx]
     return mut
 
-JSON_FILE = "items.json"
-MAX_WEIGHT = 10
-POPULATION_SIZE = 100
-GENERATIONS = 50
-MUTATION_RATE = 0.05
-ITEMS = itemize(parse_json(JSON_FILE))
-
 def main():
-    print(f"loaded {len(ITEMS)} items, weight limit {MAX_WEIGHT}")
-    print(f"{2**len(ITEMS)} possible solutions, will try {POPULATION_SIZE*GENERATIONS}")
+    items = itemize(parse_json(JSON_FILE))
+
+    print(f"loaded {len(items)} items, weight limit {MAX_WEIGHT}")
+    print(f"{2**len(items)} possible solutions, will try {POPULATION_SIZE*GENERATIONS}")
 
     start_time = time()
 
-    genotypes = np.random.randint(0, 2, (POPULATION_SIZE, len(ITEMS)))
+    genotypes = np.random.randint(0, 2, (POPULATION_SIZE, len(items)))
 
     best_phenotype = []
     best_score = 0
     for _ in range(GENERATIONS):
-        phenotypes = [gamma(g) for g in genotypes]
+        phenotypes = [gamma(g, items) for g in genotypes]
         scores = np.array([fitness(f) for f in phenotypes])
 
         best_idx = np.argmax(scores)
@@ -117,7 +118,7 @@ def main():
 
         scores = scores / np.sum(scores) # normalize
         genotypes = np.array([select(genotypes, scores) for _ in range(POPULATION_SIZE)])
-        genotypes = np.reshape([crossover(genotypes[idx], genotypes[idx+1]) for idx in range(0, POPULATION_SIZE, 2)], (POPULATION_SIZE, len(ITEMS)))
+        genotypes = np.reshape([crossover(genotypes[idx], genotypes[idx+1]) for idx in range(0, POPULATION_SIZE, 2)], (POPULATION_SIZE, len(items)))
         genotypes = np.array([mutate(g) for g in genotypes])
 
     stop_time = time()
